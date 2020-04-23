@@ -357,7 +357,7 @@ class Screencaster{
     openMicUserMedia(){
 
         return new Promise( ( resolve, reject) => {
-            
+
             navigator.mediaDevices.getUserMedia( { video: false, audio: this.getAudioConstraints() } )
             .catch( (e) => {
                 reject( e )
@@ -415,9 +415,15 @@ class Screencaster{
 
         if( ! this.videoIn ){
             this.toggleTestVideoIn()
+            .catch( ( e ) => {
+                this.errorMsg = e
+            })
         }
         else{
             this.toggleTestVideoIn()
+            .catch( ( e ) => {
+                this.errorMsg = e
+            })
         }
     }
 
@@ -482,7 +488,7 @@ class Screencaster{
         return new Promise( (resolve, reject) => {
             navigator.mediaDevices.getUserMedia( {video: this.getVideoConstraints(), audio: false} )
             .catch( ( e ) => { reject( e ) })
-            .then( ( stream ) => { resolve( stream ) })
+            .then( ( stream ) => { if( stream ) resolve( stream ) })
         })
     }
 
@@ -836,15 +842,17 @@ class Screencaster{
 
         if( this.streamsIn){
             this.streamsIn.forEach( (streamIn) => {
-                let a = [...streamIn.getVideoTracks(), ...streamIn.getAudioTracks()]
-                a.forEach( (track) => {
-                    if(track)
-                        track.stop();
-                });
+                if( streamIn ){
+                    let a = [...streamIn.getVideoTracks(), ...streamIn.getAudioTracks()]
+                    a.forEach( (track) => {
+                        if(track)
+                            track.stop();
+                    });
+                }
             })  
         }
         
-        this.html.canvas.pause()
+        //this.html.canvas.pause()
         
         if( this.settings.usePiPAPI ){
             this.html.canvas.muted = false
