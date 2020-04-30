@@ -935,16 +935,16 @@ class Screencaster{
         }
         else{
 
+            if( this.mediaRecorder && !this.testWebCam){
+                this.mediaRecorder.stop();
+                this.html.btnDownload.disabled = false
+            }
+
             this.stopRecording()
 
             this.setButtonsrecording( false)
 
             this.html.btnStart.classList.remove('recording')
-
-            if( this.mediaRecorder && !this.testWebCam){
-                this.mediaRecorder.stop();
-                this.html.btnDownload.disabled = false
-            }
 
             this.videoIn = false
         }
