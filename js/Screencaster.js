@@ -101,6 +101,8 @@ class Screencaster{
             sampleRate: 44100
         },
         this.videoConstraints = true
+        this.videoStreamWidth = 0;
+        this.videoStreamHeight = 0
         this.testWebcam = false
         this.errorMsg = '';
     }
@@ -624,7 +626,7 @@ class Screencaster{
 
         if( stream2 ){
             if( ! this.merger )
-                this.merger = new VideoStreamMerger( { width: window.screen.width, height: window.screen.height} )
+                this.merger = new VideoStreamMerger( { width: this.videoStreamWidth, height: this.videoStreamHeight} )
 
             if( audio.getAudioTracks().length == 0 ){
                 this.errorMsg = 'Cannot merge picture in picture because no audio stream is available.'
@@ -771,6 +773,10 @@ class Screencaster{
                         if( ! stream0 ) {
                             return reject( )
                         }
+
+                        let settings = stream0.getTracks()[0].getSettings()
+                        this.videoStreamWidth = settings.width;
+                        this.videoStreamHeight = settings.height;
                         
                         let promises = this.buildPromises(),
                         streamsIn = [];
