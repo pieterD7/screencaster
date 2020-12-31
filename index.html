@@ -1,525 +1,85 @@
 <!doctype html>
 <html>
-    <title>How to make a screencast online</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
--->
-    <script src='js/vue.min.js'></script>
-    <script src='lang/en/strings.js'></script>
-    <script src='lang/nl/strings.js'></script>
-
-    <style>
-        [v-cloak] { display:none; }
-        :root {
-            color-scheme: light dark;
-            --special-background-color: '#f7f7f7';
-            --special-text-color: #202020;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --special-background-color: black;
-                --special-text-color: #f7f7f7;
-                }
-        }
-        
-        #settings:target, #recorder:target{
-            display:block;
-        }
-        html{
-            background: var(--special-background-color);
-            font-family: sans-serif;
-            line-height: 1.5em;
-        }
+    <head>
+        <style type='text/css'>
         body{
-            height: 100vh;
-            width: 100vw;
-            margin: 0;
+            font-family: sans-serif;
+            line-height: 2rem;
+            width: 80%;
+            margin: 0 auto;
+            background-color: #f7f7f7;
         }
-        code{
-            font-weight: bold;
-        }
-        video{
-            visibility: visible;
-            width: 100%;
-        }
-        canvas{
-            display: none;
-        }
-        meter{
-            position: fixed;
-            top: 50%;
-            left: calc(50% - 12.5%);
-            width: 25%;
-            transform: rotate(-90deg);
-            color:lime;
-            display: none;
-        }
-        input{
-            padding: 0.25em;
-        }
-        input[type=checkbox]{
-            transform: scale(1.8);
-            padding: 5px;
-            margin-right: 0.5em;
-        }
-        blockquote{
-            font-weight: bold;
-        }
-        #btnStart.recording svg{
-            fill: red;
-        }
-        .buttonBar div.recording span{
-            background-color: red;
-            color: white;
-        }
-        .form .checkboxes{
-            line-height: 2em;
-            margin-bottom: 1em;
-        }
-        .form span:not(.slider){
-            max-width: 350px;
-            width: 50%;
-            display: inline-block;
-        }
-        #canvasName{
-            width: 100px;
-            height: 50px;
-        }
-        #canvasAvatar{
-        }
-        #avatar{
-            display: inline-block;
-            vertical-align: middle;
-            margin-top: 2em;
-            border:1px solid lime;
-            width:100px;
-            height:100px;
-        }
-        #avatar span{
-            cursor: pointer;
-        }
-        #errorMsg{
-            padding: 1em;
-            margin-bottom: 1em;
-            word-wrap: break-word;
-            color:white;
-            background: red;
-        }
-        #errorMsg > div{
-            border: 2px dotted white;
-            padding: 1em;
-        }
-        #errorMsg span{
-            position: relative;
-            top: -2em;
-            padding: 1em;
-            float:right;
-            cursor: pointer;
-        }
-        #vueApp{
-            padding: 0 1em;
-        }
-        #recorder{
-            padding: 1em;
-            width: 50vw;
-            display: none;
-        }
-        #settings{
-            display:none;
-        }
-        #video{
-            display: block;
-            background: white;
-        }
-        .grayed{
-            opacity:50%;
-        }
-        .previewAvatar{
-            width:100px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
+        body > div{
             background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
+            padding: 2rem;
         }
-
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #2196F3;
-        }
-
-        input:checked + .slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-        }
-
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        .buttonBar{
-            font-family: monospace;
-            border-radius: 0.25em;
-            margin-top: 4px;
-            padding: 0.5em 0em;
-            background: black;
-            opacity: 0.9;
-        }
-        .buttonBar > div{
-            border: 1px solid #202020;
-            display: flex;
-            color: white;
+        body > div > div{
             text-align: center;
         }
-        .buttonBar > div > div{
-            display: flex;
-            flex-grow: 1;
-        }
-        .buttonBar .column{
-            display: flex;
-            flex-grow: 1;
-            flex-direction: column;
-        }
-        .buttonBar .header{
-            display: block;
-        }
-        .buttonBar .header svg{
-            float: right;
-            cursor: pointer;
-            margin: 1px;
-        }
-        .buttonBar .column:nth-child(2){
-            flex-grow: 1.5;
-            background: black;
-        }
-        .buttonBar .column > div{
-            display: flex;
-            border: 1px solid #303030;
-        }
-        .buttonBar span{
-            color: #404040;
-            width: 100%;
+        h1{
             text-align: center;
         }
-        button img{
-            height:30px;
-            transform:translateY(+.1rem);
+        span{
+            text-decoration: underline;
         }
-        button svg{
-            transform:translateY(+.05rem);
-            width:1.4rem;
+        img{
+            max-width: 100%;
         }
-        #btnStart svg{
-            fill:lime;
-        }
-        button:disabled svg{
-            opacity: 0.25;
-        }
-        body.recording #btnStart{
-            fill:red;
-        }
-        button{
-            float: left;
-            flex-grow:1;
-            height:2.5rem;
-            min-width:2rem;
-            border:none;
-            border-radius:.25rem;
-            background:#151515;
-            color: #f7f7f7;
-            margin-left:2px;
-            box-shadow:inset 0 -.15rem 0 rgba(0,0,0,.2);
-            cursor:pointer;
-            display:flex;
-            justify-content:center;
-            align-items:center}
-        button:focus, button:hover{
-            outline:none;
-            background:black
-        }
-        button:active{
-            line-height:3rem
-        }
-        button:disabled{
-            pointer-events:none;
-            background:black;
-            color:#707070
-        }
-        button:disabled img{
-            opacity: 0.25;
-        } 
-        button:disabled svg{
-            fill:#404040;
-        }
-        button text{
-            fill:#f7f7f7
-        }
-        button:focus text, button:hover text{
-            fill:black
-        }
-        button:disabled text{
-            fill:black
-        }
-        @media screen and (max-width: 480px){
-            #recorder{
-                width: calc(100vw - 2em);
-            }
-        }
-    </style>
+        </style>
+    </head>
+<body>
+<div>
 
-    <body>
+    <img src='img/architecture.jpg'/>
+<br><br>
 
-        <div id='vueApp'>
+<h1>How can you make a free screencast video online?</h1>
+<p>With online tools like Microsoft Teams or Zoom, you can simply share your computer screen
+with group members who joined the meeting, but what if you want to make a video to share
+with Youtube or your website? Do you need a paid license for software?</p>
 
-            <div id='errorMsg' v-cloak v-if='screencast.errorMsg'>
-                <div>
-                    <span v-on:click='screencast.errorMsg = ""'>X</span>
-                    {{ screencast.errorMsg }}
-                </div>
-            </div>
-            
-            <div id='settings' v-cloak class='form'>
-                <br/>
+<p>Fortunately, the possibility to make a screencast video is <span>built into most browsers for PCs</span>. It
+is called WebRTC, Real-Time Communication over the web, so you don't need to buy a
+license because you already have all the features ready to use for a video of your computer
+screen. So you can show how to use certain software you are good at or to explain a task
+visually to other people who are offline when making the video simply by using a browser
+and a (built-in) microphone.</p>
 
-                <div class='checkboxes'>
-                    <span>{{lang.msgAvatarYesNo}}</span>
-                    <label class="switch">
-                        <input type="checkbox" v-model='screencast.settings.pInP'>
-                        <span class="slider round"></span>
-                    </label><br/>
-                    
-                    <span>{{lang.msgDefaultDevices}}</span>
-                    <label class="switch">
-                        <input type="checkbox" v-model='screencast.settings.useDefaultDevices'>
-                        <span class="slider round"></span>
-                    </label><br/>
+<div><img src='img/webcam.png'/></div>
 
-                    <span>{{lang.msgUseHeadset}}</span>
-                    <label class="switch">
-                        <input type="checkbox" v-model='screencast.settings.headset'>
-                        <span class="slider round"></span>
-                    </label><br/>
-                </div>
-                <span>{{lang.msgSavePer}} :</span> <input type='number' step='10' min='50' max='2000' v-model='screencast.settings.samplesMillis'><br/>
+<h1>Where to start?</h1>
+<p>Here you find <a href='app.html'>a webpage to make a screencast video</a>. The resulting video file is in the
+WebM-format and if you want to share it with <span>YouTube</span> you are all set because <span>YouTube</span>
+allows you to upload videos in this format. On a webpage, you can use the video in
+<span>WordPress</span> for example. If you have downloaded the video you can drag it inside a tab of the
+browser, Chrome for instance, which will start playing the video. If you want to share the
+video with Facebook you need to convert the video to the MP4 format. You can do this with
+FFmpeg which is free and open source. Visit the <a href='https://ffmpeg.org/' target='_blank'>FFmpeg page</a> to see how to do this.
+</p>
 
-                <div v-if='screencast.settings.pInP'>
-                    <br/>
-                    <span v-bind:class='{grayed: !screencast.hasPiPAPI()}'>{{lang.msgCastWebcam}}</span>
-                    <label class="switch">
-                        <input type="checkbox" v-model="screencast.settings.usePiPAPI" v-bind:disabled='! screencast.hasPiPAPI()'>
-                        <span class="slider round"></span>
-                    </label><br/>
-                    
-                    <div v-if='screencast.settings.usePiPAPI'>
-                        <p id='msgPIPExplain'>{{lang.msgPIPExplain}}</p>
-                    </div>
-                    <br/>
-                    <span>{{lang.msgDisplayName}}:</span> <input v-model='screencast.settings.personName' id='personName'><br/>
-                    <br>
-                    <span id='msgAvatar'>Avatar :</span>
-                    <input type="file" id='inpSelectFile' @change='selectFile'/><br/>
-                    <span>&nbsp;</span>
-                    <div id='avatar'>
-                    </div>
-                </div>
+<div><img src='img/microphone.png'/> </div>
 
-                <div id='msgMicPlayBack' v-if='screencast.settings.headset'>
-                        {{lang.msgMicPlayBack}} :  <br/> 
-                        <blockquote cite='http://example.com'>
-                            Control Panel &rarr; 
-                            Audiodevices &rarr; 
-                            Double click the microphone &rarr; 
-                            Listen &rarr; 
-                            Listen to this device</blockquote>
-                </div>
-                <br/>
-                <div v-if='! screencast.settings.useDefaultDevices'>
-                    <select v-model='screencast.settings.audioDeviceId' v-if='screencast.audioInputDevices.length > 0'>
-                        <option v-for='device in screencast.audioInputDevices' :value='device.deviceId'>{{device.label}}</option>
-                    </select>
-                    <select v-model='screencast.settings.videoDeviceId' v-if='screencast.videoInputDevices.length > 0'>
-                        <option v-for='device in screencast.videoInputDevices' :value='device.deviceId'>{{device.label}}</option>
-                    </select>
-                </div>
-                <br/>
-                <button id='msgContinue' v-on:click='document.location.href = "#recorder"'></button>
-            </div>
-        </div>
+<h1>Step by step</h1>
+<p>The steps to take are the following:</p>
+<ol>
+<li>Prepare thoroughly the task you want to explain. Think about it and prepare the
+actions and the text you what to say along with them.</li>
+<li>It can be helpful to write down the keywords of the video and what you want the
+viewer to understand.</li>
+<li>Test your audio and, possibly, webcam input. Check out the settings with the
+hamburger icon if you miss the audio stream. On Windows it can be helpfull to install Stereo-mix of the sound card: 
+<span>Right click the loudspeaker icon in the system tray</span> -> <span>Open sound settings</span> -> <span>Administer input devices</span> -> <span>Enable Stereo-mix</span></li>
+<li>If you are well prepared <a href='app.html'>make the video</a>.</li>
+<li>During the recording, you can use the Pause button. Click it again to continue
+recording.</li>
+</ol>
+</p>
 
-        <div id='recorder'>
-
-            <div id='video'>
-                <video playsinline controls></video>
-                <canvas id='canvasAvatar'></canvas>
-                <canvas id='canvasName'></canvas>
-            </div>
-
-            <div class='buttonBar'>
-
-                    <div class='header'><span id='msgTitle'>schermvideo maken</span>
-                        <svg onclick='document.location.href= "#settings"' fill='#404040' viewBox="0 0 100 80" width="20" height="20">
-                            <rect width="100" height="15"></rect>
-                            <rect y="30" width="100" height="15"></rect>
-                            <rect y="60" width="100" height="15"></rect>
-                        </svg>
-                    </div>
-
-                    <div>
-                        <div class='column'>
-                            <div class='test'>
-                                <span id='msgTest'>test</span>
-                            </div>
-                            <div >
-                                <button id='btnTestMic' title="Test de microfoon"><img src='img/microphone.png'/></button>
-    
-                                <button id='btnTestWebCam' title="Test de camera"><img src='img/webcam.png'/></button>
-                            </div>
-                        </div>
-
-                        <div class="column">
-                            <div class='record'>
-                                <span id='msgRecording'>opname</span>
-                            </div>
-                            <div>
-                                <button id="btnStart" autocomplete="off" title="Start opname">
-                                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42"></circle></svg>
-                                </button>
-                
-                                <button id='btnPause' title="Opname pauzeren">
-                                    <svg viewBox="0 0 100 100">
-                                        <rect x='10' y='10' width='80' height='80' fill='black' stroke='white' stroke-width='5'></rect>
-                                    </svg>
-                                </button>
-                
-                                <button id='btnDownload' title="Bestand verkrijgen">
-                                    <img src='img/download.png'/>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-            </div>
-
-            <meter max="1" value="0"></meter>
-
-        </div>
-        <script>
-            if( ! document.location.protocol.match('https:') )
-                alert('Raadpleeg deze webpagina met HTTPS://' )
-
-            if( document.location.hash == '')
-                { document.location.href = '#recorder'}
-        </script>
-
-        <script src="js/video-stream-merger.js"></script>
-
-        <script src='js/soundmeter.js'></script>
-
-        <script src="js/JSProxy.js"></script>
-    
-        <script src="js/Screencaster.js"></script>
-        
-        <script>
-            var screencast = new Screencaster()
-    
-            screencast.html.recorder = document.querySelector('#recorder')
-            screencast.html.canvas = document.querySelector('#recorder video')
-            screencast.html.btnStart = document.querySelector('#btnStart')
-            screencast.html.btnPause = document.querySelector('#btnPause')
-            screencast.html.btnDownload = document.querySelector('#btnDownload')
-            screencast.html.btnTestMic = document.querySelector('#btnTestMic')
-            screencast.html.btnTestWebCam = document.querySelector('#btnTestWebCam')
-            screencast.html.mtrAudioLevel = document.querySelector('#recorder meter')
-    
-            screencast.settings.pInP = false
-            //screencast.settings.drawNameAtBottomPInP = false
-            //screencast.settings.useAvatarInPInP = true
-            screencast.init()
-
-        </script>
-    
-        <script>
-        new Vue({
-            el: '#vueApp',
-            methods:{
-                selectFile: (event) => {
-                    let avatar = document.querySelector( '#avatar' ),
-                        img = document.createElement( 'img' ),
-                        spn = document.createElement( 'span' ),
-                        file = event.target.files[ 0 ];
-
-                    img.classList.add( 'previewAvatar' )
-                    img.file = file;
-                    spn.innerText = 'X'
-                    spn.addEventListener( 'click', () => { 
-                        document.querySelector( '#avatar' ).innerHTML = '';
-                        document.querySelector( '#inpSelectFile' ).value = ''; 
-                        screencast.settings.useAvatarInPInP = false;
-                    } )
-                    avatar.innerHTML = ''
-                    avatar.appendChild( spn )
-                    avatar.appendChild( img )
-                    const reader = new FileReader();
-                    reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-                    reader.readAsDataURL(file);
-
-                    screencast.settings.useAvatarInPInP = true
-                }
-            },
-            data:{
-                screencast: screencast,
-                lang: langs[ screencast.getUserLanguagePreference()]
-            }
-        })
-
-        // This is needed for vuejs being in strict mode and therefore a TypeError is thrown when
-        // jsproxy returns false from the set function
-        //Vue.config.errorHandler = (err, vm, info) => {
-        //}
-        </script>
-
-    </body>
-    
+<br><br>
+<h1>Conclusion</h1>
+<p>Instead of making numerous screen dumps and crayons to illustrate how to do a task, or to
+get a broad audience for your talent, simply make a screencast video. It is free of charge
+because you probably already have the potential in the browser you use! <a href='app.html'>Check it out!</a></p>
+</div>
+</body>
 </html>
