@@ -14,7 +14,7 @@ class Screencaster{
             
                 // Color names or codes for foreground and background of the name at the bottom of the pInP. 
                 // Set to false if you don't want text in the picture.
-                drawNameAtBottomPInP: { fg: 'white', bg: 'red' },
+                drawNameAtBottomPInP: { fg: 'white', bg: '#202020' },
             
                 // Microphone playback
                 headset: false,
@@ -809,8 +809,14 @@ class Screencaster{
         
                             if( typeof audio != 'undefined' 
                                 && audio.getAudioTracks().length > 0
-                                && video.getVideoTracks().length > 0)
-                                this.streamOut = new MediaStream([ video.getVideoTracks()[0], audio.getAudioTracks()[0]])
+                                && video.getVideoTracks().length > 0){
+                                            
+                                    video.getVideoTracks()[0].addEventListener( 'ended', () => {
+                                        this.stopRecording()
+                                        this.toggleVideoIn()
+                                    } )
+                                    this.streamOut = new MediaStream([ video.getVideoTracks()[0], audio.getAudioTracks()[0]])
+                                }
                             else
                                 this.streamOut = this.streamsIn[ 0 ]
     
