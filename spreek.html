@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+<head>
+    <style type="text/css">
+        body > div{
+            text-align: center;
+        }
+        textarea{
+            width:80%;
+            height:12rem;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <textarea></textarea>
+        <a href="javascript:leesVoor()">Spreek</a>
+    </div>
+
+    <script>
+
+    var recognition = null,
+        recognizedText = [],
+        current = 0,
+        running = false,
+        recognizedText2 = ''
+
+    function canvasBlack(){
+        var cnvs = document.querySelector( 'canvas' ),
+            ctx = cnvs.getContext( '2d' )
+            
+        ctx.fillStyle = 'lime'
+
+        ctx.fillRect( 0, 0, cnvs.width, cnvs.height)
+    }
+
+    function recognize(){
+        var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition,
+            //SpeechRecognitionResultList = SpeechRecognitionResultList || webkitSpeechRecognitionResultList,
+            SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
+            
+        //SpeechRecognitionResultList.prototype.forEach = Array.prototype.forEach
+
+        running = true
+
+        recognition = new SpeechRecognition();
+
+        recognition.lang = 'en-GB';
+
+        var grammar = '#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige | bisque | black | blue | brown | chocolate | coral | crimson | cyan | fuchsia | ghostwhite | gold | goldenrod | gray | green | indigo | ivory | khaki | lavender | lime | linen | magenta | maroon | moccasin | navy | olive | orange | orchid | peru | pink | plum | purple | red | salmon | sienna | silver | snow | tan | teal | thistle | tomato | turquoise | violet | white | yellow ;'
+
+        var speechRecognitionList = new SpeechGrammarList();
+
+        speechRecognitionList.addFromString(grammar, 1);
+
+        recognition.grammars = speechRecognitionList;
+
+        recognition.continuous = true
+
+        recognition.interimResults = true
+
+        recognition.maxAlternatives = 2
+
+        recognition.onend = function(){
+            if( running )
+                recognition.start()
+        }
+
+        recognition.onresult = function(event) {
+
+            if( ! recognizedText[ current ] ){
+                recognizedText.push('')
+            }
+
+            var color = event.results;
+            //console.log( color, event.results )
+            //console.log('Confidence: ' + event.results[0][0].confidence);
+
+            recognizedText[current] = ''
+
+            color.forEach = Array.prototype.forEach
+
+            color.forEach( ( result ) => {
+                recognizedText[ current ] += result[ 0 ].transcript
+            })
+
+        }
+
+        recognition.onspeechend = function( event ) {
+
+            current++
+            recognition.stop()
+        }
+
+        recognition.start();
+    }
+
+    function stopListening(){
+        recognition.stop();
+
+        running = false
+
+        current = 0
+
+        setTimeout( () => {
+            var p = document.createElement('p')
+                p.innerText = recognizedText.join( ' ' )
+
+            document.body.appendChild( p )
+
+            recognizedText = []
+        }, 1000)
+
+    }
+
+    function getVoices(){
+        return new Promise( ( resolve, reject ) => {
+            function _getVoices(){
+                return window.speechSynthesis.getVoices()
+            }
+            var voices = _getVoices()
+            if( typeof voices == 'undefined' || voices.length == 0){
+                var timer = setInterval( () => {
+                    voices = _getVoices()
+                    if( voices.length > 0){
+                        clearInterval( timer )
+                        resolve( voices )
+                    }
+                }, 1000)
+            }
+            else 
+                resolve( voices )
+        })
+    }
+    function speak (message, volume, male) {
+
+
+            //msg.pitch = 1/volume
+        //msg.pitch = 5
+        //msg.voice = new SpeechSynthesisVoice()    
+        getVoices()
+        .catch( ( e ) => {
+            console.log( e )
+        })
+        .then( ( voices ) => {
+
+            console.log( voices )
+
+            var msg = new SpeechSynthesisUtterance(message)
+
+            if(volume)
+                msg.rate = 1/volume
+
+            msg.lang = 'en-GB'
+            msg.lang = 'nl-NL'
+            if( male )
+                msg.voice = voices[ 16 ]
+            window.speechSynthesis.speak(msg)
+        })
+
+    }
+
+    function leesVoor(){
+        var text = document.querySelector('textarea') ? document.querySelector('textarea').value  : ''
+        speak(text)
+    }
+
+    function spreek(){
+
+        if( recognizedText != ''){
+            speak( recognizedText, 1, false )
+            return
+        }
+
+        speak( 'Hoi, hoe gaat het?', 1, true );
+
+        return;
+
+        speak( 'You are not your brain', 1, true )
+
+        return
+
+        speak( 'hello Joey.', 0.5, false )
+
+        speak( 'Ha, ha, ha, ha, mmmmmmm', 1, false )
+
+        return
+
+        setTimeout( () => {
+            speak( 'I repeat: HELLO Joey', 3, false )
+        }, 5000)
+
+        speak( `The Great Google Revolt - The New York Timeswww.nytimes.com › interactive › 2020/02/18 › magazine
+Feb 18, 2020 - Rebecca Rivers, a Google engineer and activist, was fired by the company in November. Bobby Doherty for The New York Times ...`, 1, true)
+
+        setTimeout( () => {
+            speak( 'A cookie associated with a cross-site resource at http://youtube.com/ was set without the "SameSite" attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with "SameSite=None" and Secure. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.', 1, true )
+
+        }, 8000)
+
+        return
+    }
+    </script>
+
+    <script>
+        var recorder = null,
+            audio = document.querySelector( 'audio' ),
+            video = document.querySelector( 'video' ),
+            what = document.querySelector( 'select' ) ? document.querySelector( 'select' ).value : '',
+            chunks = [],
+            audioStream = null,
+            videoStream = null
+
+        function start(){
+
+            navigator.mediaDevices.getUserMedia( { audio: true } )
+            .then( (stream) => {
+
+                    canvasBlack()
+
+                    audioStream = stream
+                    videoStream = document.querySelector( 'canvas' ).captureStream( 100 )
+
+                    if( what == 'audio')
+                        recorder = new MediaRecorder( stream )
+                    else
+                        recorder = new MediaRecorder( new MediaStream( [ videoStream.getVideoTracks()[0], stream.getAudioTracks()[0] ]), {mimeType: 'video/webm'} )
+
+                    if( what != 'audio')
+                        setInterval( () => {
+                            canvasBlack()
+                        }, 5)
+
+                    recorder.ondataavailable = (event) => {
+                        if (event.data && event.data.size > 0) {
+                            chunks.push(event.data);
+                        }
+                    }
+                    recorder.onstop = evt => {
+                        let blob = new Blob(chunks, { type: 'video/webm' });
+                        if( what == 'audio')
+                            audio.src = URL.createObjectURL(blob);
+                        else{
+                            video.src = URL.createObjectURL(blob);
+                            video.play()
+                        }
+                    };
+                    recorder.start( 100 )
+            })
+        }
+        function stop(){
+            recorder.stop()
+            audioStream.getAudioTracks()[0].stop()
+            videoStream.getVideoTracks()[0].stop()
+        }
+    </script>
+</body>
+</html>
