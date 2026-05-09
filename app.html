@@ -432,10 +432,6 @@
                                         <rect x='10' y='10' width='80' height='80' fill='black' stroke='white' stroke-width='5'></rect>
                                     </svg>
                                 </button>
-                
-                                <button id='btnDownload' title="Bestand verkrijgen">
-                                    <img src='img/download.png'/>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -468,7 +464,6 @@
             screencast.html.canvas = document.querySelector('#recorder video')
             screencast.html.btnStart = document.querySelector('#btnStart')
             screencast.html.btnPause = document.querySelector('#btnPause')
-            screencast.html.btnDownload = document.querySelector('#btnDownload')
             screencast.html.btnTestMic = document.querySelector('#btnTestMic')
             screencast.html.btnTestWebCam = document.querySelector('#btnTestWebCam')
             screencast.html.mtrAudioLevel = document.querySelector('#recorder meter')
@@ -520,6 +515,8 @@
         //}
         </script>
 
+        <script src="https://cdn.jsdelivr.net/npm/ts-ebml/dist/index.js"></script>
+    
     </body>
     
 </html>

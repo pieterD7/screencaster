@@ -23,8 +23,8 @@ class Screencaster{
                 // Only makes sense whith pInP == true together with useAvatar == false, or headset == false
                 useDefaultDevices: true,
             
-                // Collect 100ms of data
-                samplesMillis: 100, 
+                // Collect 1s of data
+                samplesMillis: 1000, 
                 
             }, {
                 pInP : 'boolean', 
@@ -105,6 +105,7 @@ class Screencaster{
         this.videoStreamHeight = 0
         this.testWebcam = false
         this.errorMsg = '';
+        this.handle = null;
     }
 
     getUserLanguagePreference(){
@@ -116,8 +117,6 @@ class Screencaster{
 
     init(){
 
-        this.html.btnDownload.disabled = true
-
         this.html.btnStart.addEventListener( 'click', () => { this.toggleVideoIn() } )
         this.html.btnPause.addEventListener( 'click', () => { this.pauseRecording() } )
         this.html.btnDownload.addEventListener( 'click', () => { this.download() } )
@@ -125,6 +124,7 @@ class Screencaster{
         this.html.btnTestWebCam.addEventListener( 'click', () => { this.toggleTestWebCam() } )
         //this.html.canvas.addEventListener( 'play', this.soundLevelVideoStream)
 
+        this.html.btnStart.disabled = true
         this.html.btnPause.disabled = true
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -671,14 +671,16 @@ class Screencaster{
         this.html.canvas.play()
     }
 
-    startMediaRecorder( stream ){
-        let options = {mimeType: 'video/webm'};
-        this.recordedBlobs = [];
+    startMediaRecorder = async ( stream ) => {
+        let options = {mimeType: 'video/webm; codecs=vp8,opus'};
         
         if( typeof MediaRecorder != 'undefined'){
+
             this.mediaRecorder = new MediaRecorder( stream, options);
-            this.mediaRecorder.ondataavailable = ( event ) => { this.handleDataAvailable(event) };
-            this.mediaRecorder.onstop = ( event ) => { this.handleStop(event) };
+            this.mediaRecorder.ondataavailable = ( event ) => { 
+                this.handleDataAvailable(event) 
+            };
+            this.mediaRecorder.onstop = async ( event ) => { await this.writable.close();  };
     
             this.mediaRecorder.start( this.settings.samplesMillis ); 
     
@@ -688,37 +690,8 @@ class Screencaster{
     }
 
 
-    handleDataAvailable( event ){
-
-        if (event.data && event.data.size > 0) {
-            this.recordedBlobs.push(event.data);
-        }
-    }
-
-    handleStop(event){
-
-        const superBuffer = new Blob(this.recordedBlobs, {type: 'video/webm'});
-        this.html.canvas.src = window.URL.createObjectURL(superBuffer);
-        this.html.canvas.play()
-
-        this.html.btnPause.disabled = true
-        this.html.btnStart.blur()
-    }
-
-    download(){
-
-        const blob = new Blob(this.recordedBlobs, {type: 'video/webm'});
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'screencast.webm';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 100);
+    handleDataAvailable = async ( event ) =>{
+        await this.writable.write(event.data);
     }
 
     startTestRecording(){
@@ -918,11 +891,20 @@ class Screencaster{
         })
     }
 
-    toggleVideoIn(){
+    toggleVideoIn = async() => {
 
         if( this.videoIn === false){
 
             this.html.btnStart.blur()
+
+            this.handle = await window.showSaveFilePicker({
+                suggestedName: `recording-${Date.now()}.webm`,
+                types: [{
+                    description: 'Video File',
+                    accept: { 'video/webm': ['.webm'] },
+                }],
+            });
+            this.writable = await this.handle.createWritable();
 
             this.startRecording()
             .catch( ( e ) => {
@@ -943,7 +925,7 @@ class Screencaster{
 
             if( this.mediaRecorder && !this.testWebCam){
                 this.mediaRecorder.stop();
-                this.html.btnDownload.disabled = false
+                //this.html.btnDownload.disabled = false
             }
 
             this.stopRecording()
