@@ -343,17 +343,9 @@ class Screencaster{
 
     }
 
-    openMicDisplayMedia(){
-        return new Promise( ( resolve, reject) => {
-
-            navigator.mediaDevices.getDisplayMedia( { video: true, audio: true } )
-            .catch( (e) => {
-                reject( e )
-            }) 
-            .then( ( stream ) => {
-                resolve( stream )
-            })
-        })
+    openMicDisplayMedia() {
+        return (navigator.mediaDevices.getDisplayMedia || navigator.mediaDevices.getUserMedia)
+            .call(navigator.mediaDevices, { video: true, audio: true });
     }
     
     openMicUserMedia(){
